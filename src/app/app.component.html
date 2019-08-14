@@ -29,15 +29,32 @@
                     </mat-icon>
                 </p>
 
-                <!-- Select -->
-                <mat-form-field class="full-width">
-                    <mat-select placeholder="Dataset" (change)="changeTab($event.value)" [value]="tabIndex">
-                        <!-- <mat-option value="new">Add set...</mat-option> -->
-                        <mat-option *ngFor="let title of tabTitles; let i = index" [value]="i">
-                            {{ title }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+<!--                &lt;!&ndash; Select &ndash;&gt;-->
+<!--                <mat-form-field class="full-width">-->
+<!--                    <mat-select placeholder="Dataset" (change)="changeTab($event.value)" [value]="tabIndex">-->
+<!--                        &lt;!&ndash; <mat-option value="new">Add set...</mat-option> &ndash;&gt;-->
+<!--                        <mat-option *ngFor="let title of tabTitles; let i = index" [value]="i">-->
+<!--                            {{ title }}-->
+<!--                        </mat-option>-->
+<!--                    </mat-select>-->
+<!--                </mat-form-field>-->
+
+              <mat-form-field class="full-width">
+                <mat-select placeholder="{{'NIE-Ontologies'}}" >
+                  <mat-option *ngFor="let ontology of nieOntologies; let i = index"  (click)="getOntologies( ontology )">
+                    {{ ontology.split('/')[ 7 ] }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Paste github link -->
+              <mat-form-field class="full-width">
+                <input matInput placeholder="Github Link" [(ngModel)]="githubLink" >
+              </mat-form-field>
+
+              <button mat-button *ngIf="githubLink" (click)="getOntologies()"> Get Ontologies </button><br>
+
+              <span *ngIf="chosenOntology" >Chosen Ontology: {{ chosenOntology.split('/')[ 7 ] }}</span>
 
                 <!-- Endpoint settings -->
                 <div *ngIf="!localStore && data">

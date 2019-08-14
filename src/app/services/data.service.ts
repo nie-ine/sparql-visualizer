@@ -114,11 +114,11 @@ export class DataService {
         return this.getPath().mergeMap(path => {
             return this.http.get<any>(path)
                 .map(x => {
-                    if(this.isOldJSONFormat(x)){
+                    if ( this.isOldJSONFormat(x)) {
                         return x[index];
-                    }else{
+                    } else {
                         return x.tabs[index];
-                    }                
+                    }
                 })
                 .map(x => {
                     x.query = Array.isArray(x.query) ? x.query.join('\n') : x.query;
