@@ -103,6 +103,8 @@ export class AppComponent implements OnInit {
 
   chosenOntology: string;
 
+  hidden: false;
+
   constructor(
     private _qs: QueryService,
     private _ds: DataService,
