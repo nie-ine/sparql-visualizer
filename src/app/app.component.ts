@@ -7,6 +7,7 @@ import 'codemirror/mode/turtle/turtle';
 import { QueryService } from './services/query.service';
 import { DataService, TabsData, ProjectData } from './services/data.service';
 import { StardogService } from './services/stardog.service';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit {
   public textOnly: boolean;
   public dataOnly: boolean = false; // Feature to be implemented
   public fullScreen: boolean = false;
+  public githubLink: string;
 
   public loading: boolean;
   public loadingMessage: string;
@@ -42,6 +44,54 @@ export class AppComponent implements OnInit {
   public localStore: boolean = true;
   public toggleTooltip: string = 'Switch to triplestore';
 
+  nieOntologies = [
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/agent-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/atharvaveda-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/catholic-orders-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/catholic-organization-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/concept-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/datatypes-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/delille-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/device-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/dietrich-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/document-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/event-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/human-geography-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/human-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/image-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/indology-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/information-carrier-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/kuno-raeber-gui-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/kuno-raeber-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/language-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/lavater-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/letter-corresponding-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/linguistic-morphology-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/linguistics-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/literature-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/logic-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/mathematics-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/meyer-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/nietzsche-ontology.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/note-structure-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/organization-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/parzival-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/philosophies-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/philosophy-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/physical-entity-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/physical-geography-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/prosodic-structure-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/publishing-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/scholarly-editing-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/scholasticism-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/teaching-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/text-editing-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/text-expression-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/text-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/text-structure-ontology-knora.ttl',
+    'https://raw.githubusercontent.com/nie-ine/Ontologies-shared/master/nie-ontologies_shared/woelfflin-ontology-knora.ttl'
+  ];
+
   // Codemirror
   cmConfig = { 
     lineNumbers: true,
@@ -51,13 +101,18 @@ export class AppComponent implements OnInit {
     mode: 'text/turtle'
   };
 
+  chosenOntology: string;
+
+  hidden: false;
+
   constructor(
     private _qs: QueryService,
     private _ds: DataService,
     private _ss: StardogService,
     private route: ActivatedRoute,
     public snackBar: MatSnackBar,
-    private titleService: Title
+    private titleService: Title,
+    public http: HttpClient
   ) {}
 
   ngOnInit(){
@@ -234,6 +289,8 @@ export class AppComponent implements OnInit {
       this.tabIndex = i;
       this._ds.getSingle(i)
         .subscribe(x => {
+
+          console.log( this.data );
             this.data = x;
 
             // Use reasoning if the JSON says so
@@ -242,14 +299,14 @@ export class AppComponent implements OnInit {
             // Hide triples, query and result tab if setting textOnly is true
             this.textOnly = x.textOnly ? x.textOnly : false;;
 
-            //Perform the query if the tab has a query assigned
+            // Perform the query if the tab has a query assigned
             if(this.data.query){
               this.doQuery();
+              console.log( 'Do query' );
             }else{
               this.queryResult = null;
             }
         });
-    
     }
   }
 
@@ -288,6 +345,26 @@ export class AppComponent implements OnInit {
 
   update(ev){
     console.log(ev);
+  }
+
+  getOntologies( ontology?: string) {
+    this.chosenOntology = ontology || this.githubLink;
+    this.http.get<any>(ontology || this.githubLink )
+      .subscribe(
+        data => {
+          console.log( data );
+        },
+        error1 => {
+          console.log( error1 );
+          console.log( error1.error.text );
+          this.data.triples = error1.error.text;
+          this.reasoning = false;
+          this.textOnly = false;
+          this.data.query = "CONSTRUCT WHERE {?s ?p ?o}";
+          this.queryResult = null;
+          this.doQuery();
+        }
+      );
   }
 
 }
